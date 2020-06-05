@@ -1,14 +1,29 @@
 import React, { useEffect, useState } from 'react'
-import { Typography, Paper, Avatar, CircularProgress, Button } from '@material-ui/core'
+import { 
+	Typography, 
+	Paper,
+	TextField, 
+	Button,
+	AppBar,
+	Toolbar,
+	IconButton,
+} from '@material-ui/core'
+import { makeStyles } from '@material-ui/core/styles';
+
 import VerifiedUserOutlined from '@material-ui/icons/VerifiedUserOutlined'
 import withStyles from '@material-ui/core/styles/withStyles'
 import firebase from '../firebase'
 import { withRouter } from 'react-router-dom'
 
+import NotesList from './NotesList'
+import Firebase from '../firebase'
+
 const styles = theme => ({
 	main: {
 		width: 'auto',
 		display: 'block', // Fix IE 11 issue.
+		marginLeft: 2,
+		marginRight: 2,
 		marginLeft: theme.spacing.unit * 3,
 		marginRight: theme.spacing.unit * 3,
 		[theme.breakpoints.up(400 + theme.spacing.unit * 3 * 2)]: {
@@ -30,8 +45,10 @@ const styles = theme => ({
 	},
 	submit: {
 		marginTop: theme.spacing.unit * 3,
-	},
+	}
 })
+
+
 
 function Dashboard(props) {
 	const { classes } = props
@@ -44,40 +61,97 @@ function Dashboard(props) {
 	}
 
 	const [quote, setQuote] = useState('')
+	const [notes, setNotes] = useState([{id:'', note:{title: '', date:'', content:'' }}])
 
 	useEffect(() => {
 		firebase.getCurrentUserQuote().then(setQuote)
+		firebase.getNotes().then(setNotes)
 	})
 
 	return (
-		<main className={classes.main}>
-			<Paper className={classes.paper}>
-				<Avatar className={classes.avatar}>
-					<VerifiedUserOutlined />
-				</Avatar>
-				<Typography component="h1" variant="h5">
-					Hello { firebase.getCurrentUsername() }
-				</Typography>
-				<Typography component="h1" variant="h5">
-					Your quote: {quote ? `"${quote}"` : <CircularProgress size={20} />}
-				</Typography>
-				<Button
-					type="submit"
-					fullWidth
-					variant="contained"
-					color="secondary"
-					onClick={logout}
-					className={classes.submit}>
+		<div>
+			<AppBar position="static" className={classes.root}>
+				<Toolbar>
+					<IconButton edge="start" className={classes.menuButton} >
+						<VerifiedUserOutlined />
+					</IconButton>
+					<Typography className={classes.title}>
+						{ firebase.getCurrentUsername() }
+					</Typography>
+					<Button
+						type="submit"
+						color="secondary"
+						onClick={logout}>
 					Logout
-          		</Button>
+          			</Button>
+				</Toolbar>
+			</AppBar>
+			<main className={classes.main}>
+			
+			<Paper className={classes.paper}>
+				<NoteFormBase />
 			</Paper>
-		</main>
+			{/* Important */}
+			<div>
+				<NotesList quotes={notes} />
+			</div>
+			</main>
+		</div>
+		
 	)
 
 	async function logout() {
 		await firebase.logout()
 		props.history.push('/')
 	}
+
+}
+
+const NoteFormBase = (props) => {
+
+	const [title, setTitle] = useState('')
+	const [content, setContent] = useState('')
+
+
+	async function handleSave() {
+		await Firebase.addNote(title, content)
+		.catch(err => {
+			alert(err)
+		})
+	}
+
+	return(
+		<form >
+			<TextField
+				padding={2}
+				label="Title"
+				width="100%"
+				placeholder="Title"
+				onChange={
+					(event) => {setTitle(event.target.value)}
+				}
+				multiline
+				variant="outlined" />
+			<TextField
+				padding={2}
+				label="Note"
+				width="100%"
+				placeholder="Write note here"
+				onChange={
+					(event) => {setContent(event.target.value)}
+				}
+				multiline
+				rows={4}
+				variant="outlined" />
+			<Button
+				fullWidth
+				variant="contained"
+				color="secondary" 
+				onClick={handleSave}>
+				Save Note
+          	</Button>
+		</form>
+	)
 }
 
 export default withRouter(withStyles(styles)(Dashboard))
