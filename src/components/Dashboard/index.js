@@ -6,8 +6,9 @@ import {
 	Button,
 	AppBar,
 	Toolbar,
-	IconButton,
+	IconButton, CssBaseline, Grid
 } from '@material-ui/core'
+
 import { makeStyles } from '@material-ui/core/styles';
 
 import VerifiedUserOutlined from '@material-ui/icons/VerifiedUserOutlined'
@@ -44,7 +45,7 @@ const styles = theme => ({
 		backgroundColor: theme.palette.secondary.main,
 	},
 	submit: {
-		marginTop: theme.spacing.unit * 3,
+		marginLeft: theme.spacing.unit * 140,
 	}
 })
 
@@ -69,34 +70,38 @@ function Dashboard(props) {
 	})
 
 	return (
-		<div>
+		<React.Fragment>
 			<AppBar position="static" className={classes.root}>
 				<Toolbar>
-					<IconButton edge="start" className={classes.menuButton} >
+					<IconButton edge="start" className={classes.avatar} >
 						<VerifiedUserOutlined />
 					</IconButton>
 					<Typography className={classes.title}>
 						{ firebase.getCurrentUsername() }
 					</Typography>
 					<Button
+						className={classes.submit}
 						type="submit"
+						variant="contained"
 						color="secondary"
 						onClick={logout}>
 					Logout
           			</Button>
 				</Toolbar>
 			</AppBar>
-			<main className={classes.main}>
-			
-			<Paper className={classes.paper}>
-				<NoteFormBase />
-			</Paper>
-			{/* Important */}
-			<div>
-				<NotesList quotes={notes} />
-			</div>
-			</main>
-		</div>
+			<CssBaseline />
+			<Grid container maxWidth="xs">
+				<Grid xs={12} sm={4} spacing={2}>
+					<Paper className={classes.paper}>
+						<NoteFormBase />
+					</Paper>
+				</Grid>
+				<Grid xs={12} sm={8} spacing={3}>
+					<NotesList quotes={notes} />
+				</Grid>
+				
+			</Grid>
+		</React.Fragment>
 		
 	)
 
@@ -121,11 +126,10 @@ const NoteFormBase = (props) => {
 	}
 
 	return(
-		<form >
+		<form width="100%">
 			<TextField
 				padding={2}
 				label="Title"
-				width="100%"
 				placeholder="Title"
 				onChange={
 					(event) => {setTitle(event.target.value)}
@@ -135,7 +139,6 @@ const NoteFormBase = (props) => {
 			<TextField
 				padding={2}
 				label="Note"
-				width="100%"
 				placeholder="Write note here"
 				onChange={
 					(event) => {setContent(event.target.value)}

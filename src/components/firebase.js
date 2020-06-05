@@ -99,7 +99,12 @@ class Firebase {
 		if (!this.auth.currentUser) {
 			return alert('Not authorized')
 		}
-		return this.rdb.ref('users/'+this.auth.currentUser.uid+'/Notes'+note_id).remove()
+		return this.rdb.ref('users/'+this.auth.currentUser.uid+'/Notes')
+		.child(note_id)
+		.remove()
+		.catch(err => {
+			console.log(err.message)
+		})
 	}
 
 

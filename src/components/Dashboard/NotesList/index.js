@@ -8,7 +8,7 @@ import DeleteIcon from '@material-ui/icons/Delete';
 
 import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
-import firebase from '../../firebase'
+import Firebase from '../../firebase'
 
 function NotesList(props) {
     const note = props.quotes
@@ -75,8 +75,17 @@ function Note(props) {
             </Typography>
         </CardContent>
         <CardActions>
-            <Button size="small" startIcon={<DeleteIcon />} onClick={
-                () => {firebase.deleteNote(props.id)}
+            <Button size="small" 
+            variant="outlined"
+            color="secondary"
+            startIcon={<DeleteIcon />} 
+            onClick={
+                () => {
+                    Firebase.deleteNote(props.noteID).catch(err => {
+                        console.log(err.message);
+                        
+                    })
+                }
             } >Delete</Button>
         </CardActions>
         </Card>
